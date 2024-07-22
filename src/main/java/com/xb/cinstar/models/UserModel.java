@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -24,6 +25,15 @@ public class UserModel extends BaseEntity{
     public UserModel() {
 
     }
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_promotion", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "promotion_id"))
+    private List<PromotionModel> promotions;
+
+
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<OrderModel> orders;
 
     public UserModel(String fullName, Date birthDay, String numberPhone, String cic, String email, String password, String userName) {
         this.fullName = fullName;

@@ -1,28 +1,32 @@
 package com.xb.cinstar.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import lombok.Data;
 
+import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 
 @Entity()
+@Data
 @Table(name = "movie")
 public class MovieModel extends  BaseEntity{
-    private  String name;
-    private  Long duration;
-    private  String ageLimit;
-    private  String subtitle;
-    private  String category;
-    private  String performers;
-    private Date premiere;
-    private  String manager;
-    private  String movieContent;
-    private  String trailer;
-    private  String region;
-    @Enumerated(EnumType.STRING)
-    private Enum<Type> type;
+    private  Long idCode;
+
+    private  String title;
+    private  String releaseDate;
+    private String posterPath;
+    @Column(length = 2000)
+    private  String overview;
+
+    private  ETypeMovie typeMovie;
+
+    @ManyToMany(mappedBy = "movies",fetch = FetchType.LAZY)
+    private List<TheaterModel> theaters;
+
+    @OneToMany(mappedBy = "movie",fetch = FetchType.LAZY)
+    private List<ShowTimeModel>  showtimes;
 
     public MovieModel() {
 

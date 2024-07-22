@@ -10,4 +10,5 @@ public class RoleModel extends BaseEntity{
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private ERole name;
+
 }

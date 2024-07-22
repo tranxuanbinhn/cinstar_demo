@@ -64,24 +64,13 @@ public class WebSecurityConfig {
         http .authorizeHttpRequests((authz) -> authz
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/**").hasRole("USER")
-                .requestMatchers("/api/auth/**","/hello").permitAll()
+                .requestMatchers("/api/auth/**","/hello","/test/**").permitAll()
                 .anyRequest().authenticated()
         );
         http.exceptionHandling(expt -> expt.authenticationEntryPoint(unauthorizedHandler));
         http.sessionManagement(smn -> smn.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-//        http.cors().and().csrf().disable()
-//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-//                .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-//                .antMatchers("/api/test/**").permitAll()
-//                .anyRequest().authenticated();
-//
-//        http.authenticationProvider(authenticationProvider());
-//
-//        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }
