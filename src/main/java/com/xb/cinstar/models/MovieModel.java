@@ -20,12 +20,16 @@ public class MovieModel extends  BaseEntity{
     @Column(length = 2000)
     private  String overview;
 
+    private  String runtime;
+
     private  ETypeMovie typeMovie;
 
     @ManyToMany(mappedBy = "movies",fetch = FetchType.LAZY)
+    @JoinTable(name = "movie_theater", joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "theater_id"))
     private List<TheaterModel> theaters;
 
-    @OneToMany(mappedBy = "movie",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "movie",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<ShowTimeModel>  showtimes;
 
     public MovieModel() {

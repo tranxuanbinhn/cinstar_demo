@@ -14,14 +14,10 @@ public class TheaterModel extends BaseEntity{
     private  String city;
     private  String banner;
 
-    @ManyToMany
-    @JoinTable(name = "theater_movie", joinColumns = @JoinColumn(name = "theater_id"),
-    inverseJoinColumns = @JoinColumn(name = "movie_id"))
+    @ManyToMany(mappedBy = "theaters",fetch = FetchType.LAZY)
     private List<MovieModel> movies;
 
-    @ManyToMany
-    @JoinTable(name = "theater_showtime", joinColumns = @JoinColumn(name = "theater_id"),
-    inverseJoinColumns = @JoinColumn(name = "showtime_id"))
+    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ShowTimeModel> showtimes;
 
     @OneToMany(mappedBy = "theater")

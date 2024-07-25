@@ -1,15 +1,18 @@
 package com.xb.cinstar.models;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-
+@Data
 @Entity
 @Table(name = "showtime")
 public class ShowTimeModel extends BaseEntity{
     private LocalDateTime date;
+
+    private LocalDateTime endTime;
 
     @ManyToOne()
     @JoinColumn(name = "movie_id")
@@ -19,10 +22,16 @@ public class ShowTimeModel extends BaseEntity{
     @JoinColumn(name = "screen_id")
     private ScreenModel screen;
 
-    @ManyToMany(mappedBy = "showtimes")
-    private List<TheaterModel> theaters;
+    @ManyToOne()
+    @JoinColumn(name = "theater_id")
+    private TheaterModel theater;
 
     @OneToMany(mappedBy = "showtime")
     private List<TicketModel> tickets;
 
+
+
+    public ShowTimeModel() {
+
+    }
 }

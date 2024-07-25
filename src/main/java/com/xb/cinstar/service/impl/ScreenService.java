@@ -38,7 +38,7 @@ public class ScreenService implements IScreenService{
             ScreenModel screenModel = new ScreenModel();
             if(screenDTO.getId()!=null)
             {
-
+                screenModel = screenRespository.findById(screenDTO.getId()).orElseThrow(()->new ResourceNotFoundException("Not found screen update"));
             }
             screenModel = mapper.map(screenDTO, ScreenModel.class);
             List<SeatModel> seatModels = new ArrayList<>();

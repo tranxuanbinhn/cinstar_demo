@@ -8,10 +8,7 @@ import com.xb.cinstar.service.impl.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,5 +29,28 @@ public class ScreenControllerAdmin {
         screenDTO.setSeatIds(list);
         ScreenDTO result =  screenService.save(screenDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @PutMapping("/update/{id}")
+    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody ScreenDTO screenDTO)
+    {
+        List<Long> list = new ArrayList<>();
+//        for (Long i = 8226L; i < 8436; i++){
+//            list.add(i);
+//        }
+//        screenDTO.setSeatIds(list);
+        screenDTO.setId(id);
+        ScreenDTO result =  screenService.save(screenDTO);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable("id") Long id)
+    {
+        if(screenService.delete(id))
+        {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
     }
 }

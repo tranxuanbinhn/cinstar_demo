@@ -32,15 +32,13 @@ public class PromotionControllerAdmin {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
     @GetMapping( )
-    public ResponseEntity<?> getAll(@RequestParam("page") int page,@RequestParam("limit") int limit)
+    public ResponseEntity<?> getAll()
     {
-        Pageable pageable = PageRequest.of(page-1, limit);
-        List<PromotionDTO> promotionDTOS = promotionService.findAll(pageable);
-        PageResponse result = new PageResponse();
-        result.setResults(promotionDTOS);
-        result.setPage(page);
-        result.setLimit(limit);
-        return new ResponseEntity<>(result, HttpStatus.OK);
+
+        List<PromotionDTO> promotionDTOS = promotionService.findAll();
+      
+
+        return new ResponseEntity<>(promotionDTOS, HttpStatus.OK);
     }
     @GetMapping("/detail/{id}")
     public ResponseEntity<?> getDetail(@PathVariable("id") Long id)

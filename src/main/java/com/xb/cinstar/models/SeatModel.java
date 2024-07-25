@@ -18,7 +18,7 @@ public class SeatModel extends  BaseEntity{
     @OneToOne
     private TicketModel ticket;
 
-    @ManyToMany(mappedBy = "seats")
+    @ManyToMany(mappedBy = "seats",cascade = CascadeType.ALL)
     private List<ScreenModel> screens;
 
     public SeatModel() {

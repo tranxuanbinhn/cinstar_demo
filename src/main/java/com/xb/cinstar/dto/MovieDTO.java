@@ -20,6 +20,7 @@ public class MovieDTO extends AbstractDTO{
     private Long idCode;
     private String posterPath;
     private  String overview;
+    private  String runtime;
 
     private ETypeMovie typeMovie;
 

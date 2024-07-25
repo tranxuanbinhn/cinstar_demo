@@ -3,6 +3,7 @@ package com.xb.cinstar.controllers.admin;
 import com.xb.cinstar.dto.MovieDTO;
 import com.xb.cinstar.models.ETypeMovie;
 import com.xb.cinstar.payload.response.PageResponse;
+import com.xb.cinstar.pojo.MoviePOJO;
 import com.xb.cinstar.pojo.ResultPOJO;
 import com.xb.cinstar.service.impl.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -33,9 +35,17 @@ public class MovieControllerAdmin {
         return new ResponseEntity<>(resultPOJO, HttpStatus.OK);
     }
     @GetMapping("/detail")
-    public ResponseEntity<?> getDetailMovie(@RequestParam("id")Long id,@RequestParam("type") ETypeMovie type)
+    public ResponseEntity<?> getDetailMovie(@RequestParam("id")Long id)
     {
-        MovieDTO movieDTO = movieService.getDetailAndSaveMovie(id, type);
+        MoviePOJO moviePOJO = movieService.getDetailMovie(id);
+        return new ResponseEntity<>(moviePOJO, HttpStatus.OK);
+    }
+    @PostMapping()
+    public ResponseEntity<?> save(@RequestBody MoviePOJO moviePOJO)
+    {
+        List<Long> arr = new ArrayList<>();
+        arr.add(4L);
+        MovieDTO movieDTO = movieService.saveMovie(moviePOJO,ETypeMovie.MOVIE_COMINGSOON,arr);
         return new ResponseEntity<>(movieDTO, HttpStatus.OK);
     }
     @DeleteMapping("/delete/{id}")

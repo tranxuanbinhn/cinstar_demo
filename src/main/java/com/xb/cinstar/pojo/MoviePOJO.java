@@ -17,6 +17,8 @@ public class MoviePOJO implements Serializable {
     private String posterPath;
     private  String overview;
 
+    private String runtime;
+
     public MoviePOJO() {
 
     }

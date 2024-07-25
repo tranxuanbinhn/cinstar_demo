@@ -16,11 +16,11 @@ public class ScreenModel extends BaseEntity {
     @OneToMany(mappedBy = "screen")
     private List<ShowTimeModel> showtimes;
 
-    @ManyToOne()
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "theater_id")
     private TheaterModel theater;
 
-    @ManyToMany()
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "screen_seat", joinColumns = @JoinColumn(name = "screen_id"),
             inverseJoinColumns = @JoinColumn(name = "seat_id"))
     private List<SeatModel> seats;

@@ -1,12 +1,17 @@
 package com.xb.cinstar.service.impl;
 
 import com.xb.cinstar.dto.MovieDTO;
+import com.xb.cinstar.dto.MovieTheaterDTO;
+import com.xb.cinstar.dto.TheaterDTO;
 import com.xb.cinstar.exception.ResourceNotFoundException;
 import com.xb.cinstar.models.ETypeMovie;
 import com.xb.cinstar.models.MovieModel;
+import com.xb.cinstar.models.TheaterModel;
 import com.xb.cinstar.pojo.MoviePOJO;
 import com.xb.cinstar.pojo.ResultPOJO;
 import com.xb.cinstar.repository.IMovieRespository;
+import com.xb.cinstar.repository.ITheaterRespository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +41,9 @@ public class MovieService {
     @Value("${themoviedb.url.showing}")
     private String apiUrlSh;
 
+
     @Autowired private IMovieRespository movieRespository;
+    @Autowired private ITheaterRespository theaterRespository;
 
     @Autowired
     private ModelMapper mapper ;
@@ -68,7 +75,7 @@ public class MovieService {
 
     }
 
-    public MovieDTO getDetailAndSaveMovie(Long id, ETypeMovie eTypeMovie) {
+    public MoviePOJO getDetailMovie(Long id ) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
@@ -79,19 +86,30 @@ public class MovieService {
                 .exchange(urlMain+"/"+id+"?language=en-US", HttpMethod.GET, request, MoviePOJO.class);
         MoviePOJO movie = response.getBody();
 
-        MovieDTO movieDTO = new MovieDTO();
-        movieDTO = mapper.map(movie, MovieDTO.class);
-        movieDTO.setIdCode(movie.getId());
-        movieDTO.setTypeMovie(eTypeMovie);
-        movieDTO = saveMovie(movieDTO);
-        return  movieDTO;
-    }
 
-    public MovieDTO saveMovie(MovieDTO movieDTO) throws ResourceNotFoundException
+        return  movie;
+    }
+    @Transactional
+    public MovieDTO saveMovie(MoviePOJO moviePOJO, ETypeMovie typeMovie, List<Long> theaterIds) throws ResourceNotFoundException
     {
+        MovieDTO movieDTO = new MovieDTO();
+        movieDTO = mapper.map(moviePOJO, MovieDTO.class);
+        movieDTO.setIdCode(movieDTO.getId());
+        movieDTO.setTypeMovie(typeMovie);
+
         MovieModel movieModel = mapper.map(movieDTO, MovieModel.class);
+        List<TheaterModel> theaters = new ArrayList<>();
+        theaterIds.stream().forEach(id ->
+        {
+            TheaterModel theaterModel = theaterRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Not found theater"));
+            theaters.add(theaterModel);
+        });
+        movieModel.setTheaters(theaters);
         movieModel = movieRespository.save(movieModel);
-        return  mapper.map(movieModel, MovieDTO.class);
+
+
+    return  mapper.map(movieModel, MovieDTO.class);
+
     }
 
     public boolean deleteMovieById(Long id)
@@ -118,14 +136,14 @@ public class MovieService {
         });
         return result;
     }
-    public List<MovieDTO> getShowingMovie(Pageable pageable) {
+    public List<MovieDTO> getShowingMovie() {
 
         List<MovieDTO> result = new ArrayList<>();
-        Page<MovieModel> movieModels = movieRespository.findAll(pageable);
-        movieModels.getContent().forEach(movieModel -> {
+        List<MovieModel> movieModels = movieRespository.findAll();
+        movieModels.forEach(movieModel -> {
             MovieDTO movieDTO = new MovieDTO();
             movieDTO = mapper.map(movieModel, MovieDTO.class);
-            if(movieModel.getTypeMovie().equals("MOVIE_NOWSHOWING"))
+            if(movieModel.getTypeMovie().name().equals("MOVIE_NOWSHOWING"))
             {
                 result.add(movieDTO);
             }
@@ -133,14 +151,14 @@ public class MovieService {
         });
         return result;
     }
-    public List<MovieDTO> getCommingSoonMovie(Pageable pageable) {
+    public List<MovieDTO> getCommingSoonMovie() {
 
         List<MovieDTO> result = new ArrayList<>();
-        Page<MovieModel> movieModels = movieRespository.findAll(pageable);
-        movieModels.getContent().forEach(movieModel -> {
+        List<MovieModel> movieModels = movieRespository.findAll();
+        movieModels.forEach(movieModel -> {
             MovieDTO movieDTO = new MovieDTO();
             movieDTO = mapper.map(movieModel, MovieDTO.class);
-            if(movieModel.getTypeMovie().equals("MOVIE_COMINGSOON"))
+            if(movieModel.getTypeMovie().name().equals("MOVIE_COMINGSOON"))
             {
                 result.add(movieDTO);
             }
@@ -149,8 +167,43 @@ public class MovieService {
         return result;
     }
 
+    public MovieTheaterDTO findMovieOrTheater(String keyword) {
+
+        List<MovieModel> movieModels = movieRespository.findMovieByKeyword(keyword);
+        List<TheaterModel> theaterModels = theaterRespository.findTheaterByKeyword(keyword);
+        List<MovieDTO> resultMovie = new ArrayList<>();
+        movieModels.stream().forEach(movieModel -> {
+            MovieDTO movieDTO = new MovieDTO();
+            movieDTO=mapper.map(movieModel, MovieDTO.class);
+            resultMovie.add(movieDTO);
+        });
+        List<TheaterDTO> resulTheater = new ArrayList<>();
+        theaterModels.stream().forEach(theaterModel -> {
+            TheaterDTO theaterDTO = new TheaterDTO();
+            theaterDTO=mapper.map(theaterModel, TheaterDTO.class);
+            resulTheater.add(theaterDTO);
+        });
+
+
+        MovieTheaterDTO movieTheaterDTO = new MovieTheaterDTO();
+        movieTheaterDTO.setMovieDTOs(resultMovie);
+        movieTheaterDTO.setTheaterDTOs(resulTheater);
+
+        return movieTheaterDTO;
+    }
 
 
 
+    public MovieDTO findMovieInDataBase(Long id)
+    {
+        MovieModel movieModel = movieRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Not found this movie"));
+        MovieDTO result = mapper.map(movieModel, MovieDTO.class);
+        List<Long> theaterids = new ArrayList<>();
+        movieModel.getTheaters().forEach(theaterModel -> {
+        theaterids.add(theaterModel.getId());
+        result.setTheaterIds(theaterids);
+        });
+       return mapper.map(movieModel, MovieDTO.class);
+    }
 
 }

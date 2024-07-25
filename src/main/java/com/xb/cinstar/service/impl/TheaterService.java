@@ -30,8 +30,6 @@ public class TheaterService implements ITheaterService {
                 theaterModel =theaterRespository.findById(theaterDTO.getId()).get();
 
             }
-
-
             theaterModel = mapper.map(theaterDTO, TheaterModel.class);
             theaterModel = theaterRespository.save(theaterModel);
             return mapper.map(theaterModel, TheaterDTO.class);
@@ -55,6 +53,8 @@ public class TheaterService implements ITheaterService {
         }
 
     }
+
+
 
     @Override
     public boolean update(Long id) {

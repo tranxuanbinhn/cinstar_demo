@@ -61,22 +61,25 @@ public class PromotionService implements IPromotionService {
         return false;
     }
 
-    @Override
-    public List<PromotionDTO> findAll() {
-        return null;
-    }
 
-    public List<PromotionDTO> findAll(Pageable pageable)
+
+    @Override
+    public List<PromotionDTO> findAll()
     {
-        Page<PromotionModel> theaters = promotionService.findAll(pageable);
+        List<PromotionModel> theaters = promotionService.findAll();
         List<PromotionDTO> result = new ArrayList<>();
-        theaters.getContent().stream().forEach(theater->{
+        theaters.stream().forEach(theater->{
                     PromotionDTO promotionDTO = new PromotionDTO();
                     promotionDTO = mapper.map(theater, PromotionDTO.class);
                     result.add(promotionDTO);
                 }
         );
         return result;
+    }
+
+    @Override
+    public List<PromotionDTO> findAll(Pageable pageable) {
+        return null;
     }
 
     public PromotionDTO findById(Long id){
