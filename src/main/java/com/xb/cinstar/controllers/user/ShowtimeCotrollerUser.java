@@ -31,4 +31,11 @@ public class ShowtimeCotrollerUser {
         }
         return new ResponseEntity<>(showTimeDTOS, HttpStatus.OK);
     }
+    @GetMapping("/getbeymovie/{id}")
+    public ResponseEntity<?> getAllByMovieId(@PathVariable("id") Long id )
+    {
+        List<ShowTimeDTO> showTimeDTOS = showTimeService.findByMovieId(id);
+
+        return new ResponseEntity<>(showTimeDTOS, HttpStatus.OK);
+    }
 }

@@ -3,6 +3,9 @@ package com.xb.cinstar.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -15,10 +18,10 @@ public class PromotionModel extends  BaseEntity{
     private  String note;
     private String banner;
     private  String description;
-    private Double value;
+    private BigDecimal value;
+    private DayOfWeek dayOfWeek;
 
-    @OneToMany(mappedBy = "promotion")
-    private List<OrderModel> orders;
+
 
     @ManyToMany(mappedBy = "promotions")
     private List<UserModel> users;

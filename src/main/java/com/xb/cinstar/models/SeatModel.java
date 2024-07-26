@@ -15,12 +15,12 @@ public class SeatModel extends  BaseEntity{
     @Enumerated(EnumType.STRING)
     private EStatusSeat statusSeat;
 
-    @OneToOne
-    private TicketModel ticket;
+    @OneToMany(mappedBy = "seat", fetch = FetchType.LAZY)
+    private List<TicketModel> tickets;
 
     @ManyToMany(mappedBy = "seats",cascade = CascadeType.ALL)
     private List<ScreenModel> screens;
-
+    private boolean status;
     public SeatModel() {
 
     }

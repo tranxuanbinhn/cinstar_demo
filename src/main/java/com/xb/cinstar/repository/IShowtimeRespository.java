@@ -18,4 +18,7 @@ public interface IShowtimeRespository extends JpaRepository<ShowTimeModel, Long>
     )
     List<ShowTimeModel> showAll(Long movieId,LocalDateTime date);
 
+    @Query(value = "select * from showtime where movie_id = ?", nativeQuery = true)
+    List<ShowTimeModel> findAllByMovieId(Long id);
+
 }

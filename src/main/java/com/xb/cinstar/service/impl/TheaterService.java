@@ -1,7 +1,9 @@
 package com.xb.cinstar.service.impl;
 
+import com.xb.cinstar.dto.ShowTimeDTO;
 import com.xb.cinstar.dto.TheaterDTO;
 import com.xb.cinstar.exception.ResourceNotFoundException;
+import com.xb.cinstar.models.MovieModel;
 import com.xb.cinstar.models.TheaterModel;
 import com.xb.cinstar.repository.ITheaterRespository;
 import com.xb.cinstar.service.ITheaterService;
@@ -14,6 +16,7 @@ import reactor.core.Exceptions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TheaterService implements ITheaterService {
@@ -62,8 +65,17 @@ public class TheaterService implements ITheaterService {
     }
 
     @Override
-    public List<TheaterDTO> findAll() {
-        return null;
+    public List<TheaterDTO> findAll() throws ResourceNotFoundException{
+        List<TheaterModel> theaters = theaterRespository.findAll();
+        List<TheaterDTO> result = new ArrayList<>();
+        theaters.stream().forEach(theater->{
+                    TheaterDTO theaterDTO = new TheaterDTO();
+                    theaterDTO = mapper.map(theater, TheaterDTO.class);
+                    result.add(theaterDTO);
+                }
+        );
+        return result;
+
     }
 
     public List<TheaterDTO> findAll(Pageable pageable)
@@ -84,7 +96,26 @@ public class TheaterService implements ITheaterService {
     {
         throw  new ResourceNotFoundException("Not found Theater");
     }
-    return mapper.map(theaterRespository.findById(id).get(),TheaterDTO.class);
+    Optional<TheaterModel> theaterModel = theaterRespository.findById(id);
+    List<Long> ids = new ArrayList<>();
+        theaterModel.get().getMovies().stream().forEach(MovieModel->{
+            ids.add(MovieModel.getId());
+        });
+    TheaterDTO result = mapper.map(theaterModel.get(),TheaterDTO.class);
+    result.setMovieIds(ids);
+    return result;
+    }
+
+    public List<TheaterDTO> findTheaterByCity(String city)
+    {
+        List<TheaterModel> theaterModels = theaterRespository.findAllByCity(city);
+        List<TheaterDTO> result = new ArrayList<>();
+        theaterModels.stream().forEach(theaterModel -> {
+            TheaterDTO theaterDTO = new TheaterDTO();
+            theaterDTO = mapper.map(theaterModel, TheaterDTO.class);
+            result.add(theaterDTO);
+        });
+        return  result;
     }
 
 

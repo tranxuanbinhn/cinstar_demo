@@ -24,7 +24,7 @@ public class MovieModel extends  BaseEntity{
 
     private  ETypeMovie typeMovie;
 
-    @ManyToMany(mappedBy = "movies",fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "movie_theater", joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "theater_id"))
     private List<TheaterModel> theaters;

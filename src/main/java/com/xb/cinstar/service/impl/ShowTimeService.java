@@ -116,5 +116,19 @@ public class ShowTimeService implements IShowTimeService {
         return null;
     }
 
+    public List<ShowTimeDTO> findByMovieId(Long movieId) throws ResourceNotFoundException
+    {
+        List<ShowTimeModel> showTimeModels = showtimeRespository.findAllByMovieId(movieId);
+        List<ShowTimeDTO> result = new ArrayList<>();
+        showTimeModels.stream().forEach(showTimeModel ->{
+            ShowTimeDTO showTimeDTO = new ShowTimeDTO();
+            showTimeDTO = mapper.map(showTimeModel, ShowTimeDTO.class);
+            showTimeDTO.setDate(showTimeModel.getDate());
+            showTimeDTO.setMovieId(showTimeModel.getMovie().getId());
+            result.add(showTimeDTO);
+        });
+    return result;
+    }
+
 
 }

@@ -4,6 +4,7 @@ import com.xb.cinstar.dto.MovieDTO;
 import com.xb.cinstar.models.ETypeMovie;
 import com.xb.cinstar.payload.response.PageResponse;
 import com.xb.cinstar.pojo.MoviePOJO;
+import com.xb.cinstar.pojo.RequestPOJO;
 import com.xb.cinstar.pojo.ResultPOJO;
 import com.xb.cinstar.service.impl.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/test/movie")
-public class MovieControllerAdmin {
+public class MovieContronllerAdmin {
     @Autowired
     private MovieService movieService;
     @GetMapping("/upcoming")
@@ -40,12 +41,12 @@ public class MovieControllerAdmin {
         MoviePOJO moviePOJO = movieService.getDetailMovie(id);
         return new ResponseEntity<>(moviePOJO, HttpStatus.OK);
     }
-    @PostMapping()
-    public ResponseEntity<?> save(@RequestBody MoviePOJO moviePOJO)
+    @PostMapping("/add")
+    public ResponseEntity<?> save(@RequestBody RequestPOJO requestPOJO)
     {
         List<Long> arr = new ArrayList<>();
         arr.add(4L);
-        MovieDTO movieDTO = movieService.saveMovie(moviePOJO,ETypeMovie.MOVIE_COMINGSOON,arr);
+        MovieDTO movieDTO = movieService.saveMovie(requestPOJO.getMoviePOJO(), requestPOJO.getTypeMovie(),requestPOJO.getTheaterIds());
         return new ResponseEntity<>(movieDTO, HttpStatus.OK);
     }
     @DeleteMapping("/delete/{id}")

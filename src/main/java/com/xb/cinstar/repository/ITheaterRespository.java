@@ -11,5 +11,7 @@ import java.util.List;
 @Repository
 public interface ITheaterRespository extends JpaRepository<TheaterModel, Long> {
     @Query(value = "select * from theater where name like %?1%", nativeQuery = true)
-    public List<TheaterModel> findTheaterByKeyword(String keyword);
+     List<TheaterModel> findTheaterByKeyword(String keyword);
+
+    List<TheaterModel> findAllByCity(String city);
 }
