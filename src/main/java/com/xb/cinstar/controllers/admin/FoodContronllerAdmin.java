@@ -1,13 +1,9 @@
 package com.xb.cinstar.controllers.admin;
 
 import com.xb.cinstar.dto.FoodDTO;
-import com.xb.cinstar.payload.response.PageResponse;
-import com.xb.cinstar.service.SeatService;
+import com.xb.cinstar.service.impl.SeatService;
 import com.xb.cinstar.service.impl.FoodService;
-import com.xb.cinstar.service.impl.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

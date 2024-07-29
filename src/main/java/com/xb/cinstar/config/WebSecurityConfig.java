@@ -66,7 +66,7 @@ public class WebSecurityConfig {
         http .authorizeHttpRequests((authz) -> authz
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/user/**").hasRole("USER")
-                .requestMatchers("/api/auth/**","/hello","/test/**").permitAll()
+                .requestMatchers("/api/auth/**","/hello","/test/**","/api/vnpay/**").permitAll()
                 .anyRequest().authenticated()
         );
         http.exceptionHandling(expt -> expt.authenticationEntryPoint(unauthorizedHandler));

@@ -1,4 +1,4 @@
-package com.xb.cinstar.service;
+package com.xb.cinstar.service.impl;
 
 import com.xb.cinstar.dto.SeatDTO;
 import com.xb.cinstar.models.SeatModel;

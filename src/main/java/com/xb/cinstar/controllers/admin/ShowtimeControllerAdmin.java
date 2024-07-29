@@ -2,9 +2,7 @@ package com.xb.cinstar.controllers.admin;
 
 import com.xb.cinstar.dto.ShowTimeDTO;
 import com.xb.cinstar.payload.response.PageResponse;
-import com.xb.cinstar.service.SeatService;
 import com.xb.cinstar.service.impl.ShowTimeService;
-import com.xb.cinstar.service.impl.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

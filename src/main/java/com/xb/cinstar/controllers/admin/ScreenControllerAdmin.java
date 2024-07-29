@@ -1,10 +1,8 @@
 package com.xb.cinstar.controllers.admin;
 
 import com.xb.cinstar.dto.ScreenDTO;
-import com.xb.cinstar.dto.TheaterDTO;
-import com.xb.cinstar.service.SeatService;
+import com.xb.cinstar.service.impl.SeatService;
 import com.xb.cinstar.service.impl.ScreenService;
-import com.xb.cinstar.service.impl.TheaterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

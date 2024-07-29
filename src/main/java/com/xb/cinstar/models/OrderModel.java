@@ -25,7 +25,8 @@ public class OrderModel extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
-
+    @OneToOne(mappedBy = "order")
+    private PaymentModel payment;
     public OrderModel() {
 
     }
