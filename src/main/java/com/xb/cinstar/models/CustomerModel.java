@@ -4,9 +4,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
+import org.springframework.data.redis.core.RedisHash;
 
 @Entity
 @Data
+
 @Table(name = "customer")
 public class CustomerModel extends BaseEntity{
     private String name;

@@ -1,4 +1,4 @@
-package com.xb.cinstar.service;
+package com.xb.cinstar.service.impl;
 
 import com.xb.cinstar.models.UserModel;
 import com.xb.cinstar.repository.IUserRepository;

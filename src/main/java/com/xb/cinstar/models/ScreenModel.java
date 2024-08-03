@@ -2,10 +2,12 @@ package com.xb.cinstar.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.util.List;
 
 @Entity
+
 @Table(name = "screen")
 @Data
 public class ScreenModel extends BaseEntity {

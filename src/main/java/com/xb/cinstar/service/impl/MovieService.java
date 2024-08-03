@@ -1,8 +1,10 @@
 package com.xb.cinstar.service.impl;
 
+import com.xb.cinstar.constant.Constant;
 import com.xb.cinstar.dto.MovieDTO;
 import com.xb.cinstar.dto.MovieTheaterDTO;
 import com.xb.cinstar.dto.TheaterDTO;
+import com.xb.cinstar.dto.UserDTO;
 import com.xb.cinstar.exception.ResourceNotFoundException;
 import com.xb.cinstar.models.ETypeMovie;
 import com.xb.cinstar.models.MovieModel;
@@ -11,12 +13,18 @@ import com.xb.cinstar.pojo.MoviePOJO;
 import com.xb.cinstar.pojo.ResultPOJO;
 import com.xb.cinstar.repository.IMovieRespository;
 import com.xb.cinstar.repository.ITheaterRespository;
+import com.xb.cinstar.service.IGenricService;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,7 +37,8 @@ import java.util.List;
 
 
 @Service
-public class MovieService {
+
+public class MovieService  extends BaseRedisServiceImpl implements IGenricService<MovieDTO>{
     @Value("${themoviedb.accessToken}")
     private String accessToken;
     @Value("${themoviedb.url.main}")
@@ -47,6 +56,12 @@ public class MovieService {
 
     @Autowired
     private ModelMapper mapper ;
+
+
+    public MovieService(RedisTemplate<String, Object> redisTemplate) {
+        super(redisTemplate);
+    }
+
     public ResultPOJO getUpcomingMovie() {
 
         HttpHeaders headers = new HttpHeaders();
@@ -106,9 +121,22 @@ public class MovieService {
         });
         movieModel.setTheaters(theaters);
         movieModel = movieRespository.save(movieModel);
+       MovieDTO resuslt = mapper.map(movieModel, MovieDTO.class);
 
+       if(resuslt.getTypeMovie().equals("MOVIE_NOWSHOWING"))
+       {
+            this.hashSet(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX,Constant.ConstantRedis.MOVIE_PREFIX+resuslt.getId(),
+                    resuslt);
+            this.setTimeToLive(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX, Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX_TTL);
+       }
+        if(resuslt.getTypeMovie().equals("MOVIE_COMINGSOON"))
+        {
+            this.hashSet(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX,Constant.ConstantRedis.MOVIE_PREFIX+resuslt.getId(),
+                    resuslt);
+            this.setTimeToLive(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX,Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX_TTL);
+        }
 
-    return  mapper.map(movieModel, MovieDTO.class);
+    return resuslt ;
 
     }
 
@@ -116,6 +144,22 @@ public class MovieService {
     {
         try{
             movieRespository.deleteById(id);
+            if(this.exists(Constant.ConstantRedis.MOVIE_PREFIX+id))
+            {
+                this.delete(Constant.ConstantRedis.MOVIE_PREFIX+id);
+            }
+            if(this.hashExists(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX,Constant.ConstantRedis.MOVIE_PREFIX+id)
+            )
+            {
+                this.delete(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX,Constant.ConstantRedis.MOVIE_PREFIX+id);
+            }
+            if(this.hashExists(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX,Constant.ConstantRedis.MOVIE_PREFIX+id)
+            )
+            {
+                this.delete(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX,Constant.ConstantRedis.MOVIE_PREFIX+id);
+            }
+
+
             return  true;
         }
         catch (ResourceNotFoundException e)
@@ -127,6 +171,7 @@ public class MovieService {
 
     public List<MovieDTO> getAllMovie(Pageable pageable) {
 
+
         List<MovieDTO> result = new ArrayList<>();
         Page<MovieModel> movieModels = movieRespository.findAll(pageable);
         movieModels.getContent().forEach(movieModel -> {
@@ -136,35 +181,64 @@ public class MovieService {
         });
         return result;
     }
+
+
     public List<MovieDTO> getShowingMovie() {
 
         List<MovieDTO> result = new ArrayList<>();
-        List<MovieModel> movieModels = movieRespository.findAll();
-        movieModels.forEach(movieModel -> {
-            MovieDTO movieDTO = new MovieDTO();
-            movieDTO = mapper.map(movieModel, MovieDTO.class);
-            if(movieModel.getTypeMovie().name().equals("MOVIE_NOWSHOWING"))
-            {
-                result.add(movieDTO);
-            }
+        if(this.exists(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX))
+        {
 
-        });
-        return result;
+            return this.hashGetAll(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX, MovieDTO.class);
+        }
+        else
+        {
+            List<MovieModel> movieModels = movieRespository.findAll();
+            movieModels.forEach(movieModel -> {
+                MovieDTO movieDTO =  mapper.map(movieModel, MovieDTO.class);
+                if(movieModel.getTypeMovie().name().equals("MOVIE_NOWSHOWING"))
+                {
+                    result.add(movieDTO);
+                }
+
+            });
+            result.stream().forEach(movieDTO -> {
+                this.hashSet(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX,
+                        Constant.ConstantRedis.MOVIE_PREFIX+movieDTO.getId(),movieDTO);
+            });
+            this.setTimeToLive(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX,Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX_TTL);
+            return result;
+        }
+
     }
+
     public List<MovieDTO> getCommingSoonMovie() {
 
         List<MovieDTO> result = new ArrayList<>();
-        List<MovieModel> movieModels = movieRespository.findAll();
-        movieModels.forEach(movieModel -> {
-            MovieDTO movieDTO = new MovieDTO();
-            movieDTO = mapper.map(movieModel, MovieDTO.class);
-            if(movieModel.getTypeMovie().name().equals("MOVIE_COMINGSOON"))
-            {
-                result.add(movieDTO);
-            }
+        if(this.exists(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX))
+        {
+//            List<Object> objects = this.get(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX);
+           return this.hashGetAll(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX, MovieDTO.class);
+        }
+        else
+        {
+            List<MovieModel> movieModels = movieRespository.findAll();
+            movieModels.forEach(movieModel -> {
+                MovieDTO movieDTO = mapper.map(movieModel, MovieDTO.class);
+                if(movieModel.getTypeMovie().name().equals("MOVIE_COMINGSOON"))
+                {
+                    result.add(movieDTO);
+                }
 
-        });
-        return result;
+            });
+            result.stream().forEach(movieDTO -> {
+                this.hashSet(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX,
+                    Constant.ConstantRedis.MOVIE_PREFIX+movieDTO.getId(),movieDTO);
+            });
+            this.setTimeToLive(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX,Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX_TTL);
+            return result;
+        }
+
     }
 
     public MovieTheaterDTO findMovieOrTheater(String keyword) {
@@ -196,14 +270,49 @@ public class MovieService {
 
     public MovieDTO findMovieInDataBase(Long id)
     {
-        MovieModel movieModel = movieRespository.findById(id).orElseThrow(()->new ResourceNotFoundException("Not found this movie"));
-        MovieDTO result = mapper.map(movieModel, MovieDTO.class);
-        List<Long> theaterids = new ArrayList<>();
-        movieModel.getTheaters().forEach(theaterModel -> {
-        theaterids.add(theaterModel.getId());
-        result.setTheaterIds(theaterids);
-        });
-       return mapper.map(movieModel, MovieDTO.class);
+        String prefix = Constant.ConstantRedis.MOVIE_PREFIX;
+        if(this.exists(prefix+id))
+        {
+            return (MovieDTO) this.get(prefix+id);
+        }
+        else {
+            MovieModel movieModel = movieRespository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not found this movie"));
+            MovieDTO result = mapper.map(movieModel, MovieDTO.class);
+            List<Long> theaterids = new ArrayList<>();
+            movieModel.getTheaters().forEach(theaterModel -> {
+                theaterids.add(theaterModel.getId());
+                result.setTheaterIds(theaterids);
+            });
+
+            MovieDTO movieDTO = mapper.map(movieModel, MovieDTO.class);
+            this.set(prefix+result.getId(),movieDTO);
+            this.setTimeToLive(prefix+result.getId(),Constant.ConstantRedis.MOVIE_PREFIX_TTL);
+            return  movieDTO;
+        }
     }
 
+    @Override
+    public MovieDTO save(MovieDTO movieDTO) {
+        return null;
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        return false;
+    }
+
+    @Override
+    public boolean update(Long id) {
+        return false;
+    }
+
+    @Override
+    public List<MovieDTO> findAll() {
+        return null;
+    }
+
+    @Override
+    public List<MovieDTO> findAll(Pageable pageable) {
+        return null;
+    }
 }

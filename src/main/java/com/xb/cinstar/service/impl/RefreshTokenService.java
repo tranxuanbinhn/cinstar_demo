@@ -1,4 +1,4 @@
-package com.xb.cinstar.service;
+package com.xb.cinstar.service.impl;
 
 import com.xb.cinstar.exception.TokenRefreshException;
 import com.xb.cinstar.models.RefreshToken;

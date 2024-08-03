@@ -1,9 +1,7 @@
 package com.xb.cinstar.controllers.auth;
 
-import com.xb.cinstar.models.UserModel;
 import com.xb.cinstar.repository.IUserRepository;
-import com.xb.cinstar.service.UserDetailServiceImpl;
-import com.xb.cinstar.service.UserDetailsImpl;
+import com.xb.cinstar.service.impl.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;

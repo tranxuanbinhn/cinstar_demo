@@ -3,6 +3,7 @@ package com.xb.cinstar.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.validation.constraints.Size;
 import java.util.Date;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity()
 @Data
+
 @Table(name = "movie")
 public class MovieModel extends  BaseEntity{
     private  Long idCode;

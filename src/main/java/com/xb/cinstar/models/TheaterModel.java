@@ -2,11 +2,13 @@ package com.xb.cinstar.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.util.List;
 
 @Entity
 @Data
+
 @Table(name = "theater")
 public class TheaterModel extends BaseEntity{
     private String name;

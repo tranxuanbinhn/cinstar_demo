@@ -13,6 +13,9 @@ import com.xb.cinstar.repository.ITheaterRespository;
 import com.xb.cinstar.service.IScreenService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+
 public class ScreenService implements IScreenService{
 
     @Autowired private IScreenRespository screenRespository;
@@ -68,6 +72,7 @@ public class ScreenService implements IScreenService{
         }
     }
 
+
     @Override
     public boolean delete(Long id) {
         try{
@@ -91,6 +96,7 @@ public class ScreenService implements IScreenService{
     public List<ScreenDTO> findAll() {
         return null;
     }
+
 
     public List<ScreenDTO> findAll(Pageable pageable)
     {

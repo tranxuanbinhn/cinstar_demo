@@ -11,6 +11,8 @@ import com.xb.cinstar.repository.IUserRepository;
 import com.xb.cinstar.service.IUserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+
 public class UserService implements IUserService {
     @Autowired private IUserRepository userRepository;
     @Autowired private IRoleRepository roleRepository;
@@ -125,6 +128,7 @@ public class UserService implements IUserService {
 
     }
 
+
     @Override
     public boolean update(Long id) {
         return false;
@@ -134,6 +138,7 @@ public class UserService implements IUserService {
     public List<UserDTO> findAll() {
         return null;
     }
+
     public UserDTO findById(Long id) {
         Optional<UserModel> userModel = userRepository.findById(id);
         if(!userModel.isPresent())

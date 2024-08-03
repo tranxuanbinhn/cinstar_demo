@@ -12,14 +12,20 @@ import com.xb.cinstar.repository.IShowtimeRespository;
 import com.xb.cinstar.repository.ITicketRespository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
+
 public class FoodService {
     @Autowired private IFoodRespository foodRepository;
 
@@ -61,20 +67,17 @@ public class FoodService {
 
 
 
-
     public List<FoodDTO> findAll()
     {
         List<FoodModel> foods = foodRepository.findAll();
         List<FoodDTO> result = new ArrayList<>();
         foods.stream().forEach(theater->{
-            FoodDTO foodDTO = new FoodDTO();
-            foodDTO = mapper.map(theater, FoodDTO.class);
-            result.add(foodDTO);
+                    FoodDTO foodDTO = mapper.map(theater, FoodDTO.class);
+                    result.add(foodDTO);
                 }
         );
         return result;
     }
-
     public FoodDTO findById(Long id)
     {
         FoodModel foodModel = foodRepository.findById(id).orElseThrow(()-> new ResourceNotFoundException("Not found this food"));

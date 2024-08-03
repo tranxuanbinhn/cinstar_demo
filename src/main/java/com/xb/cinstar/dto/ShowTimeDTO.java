@@ -12,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
@@ -23,5 +24,7 @@ public class ShowTimeDTO extends AbstractDTO{
     private Long theaterId;
     private List<Long> ticketIds;
     private LocalDateTime endTime;
+    private String dateRedis;
+
 
 }

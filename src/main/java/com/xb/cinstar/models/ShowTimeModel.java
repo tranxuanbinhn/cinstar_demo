@@ -2,12 +2,14 @@ package com.xb.cinstar.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 @Data
 @Entity
+
 @Table(name = "showtime")
 public class ShowTimeModel extends BaseEntity{
     private LocalDateTime date;

@@ -9,6 +9,9 @@ import com.xb.cinstar.repository.ITheaterRespository;
 import com.xb.cinstar.service.ITheaterService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,8 +20,11 @@ import reactor.core.Exceptions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
+
 public class TheaterService implements ITheaterService {
     @Autowired private ITheaterRespository theaterRespository;
 
@@ -64,6 +70,7 @@ public class TheaterService implements ITheaterService {
         return false;
     }
 
+
     @Override
     public List<TheaterDTO> findAll() throws ResourceNotFoundException{
         List<TheaterModel> theaters = theaterRespository.findAll();
@@ -83,9 +90,9 @@ public class TheaterService implements ITheaterService {
         Page<TheaterModel> theaters = theaterRespository.findAll(pageable);
         List<TheaterDTO> result = new ArrayList<>();
         theaters.getContent().stream().forEach(theater->{
-            TheaterDTO theaterDTO = new TheaterDTO();
-            theaterDTO = mapper.map(theater, TheaterDTO.class);
-            result.add(theaterDTO);
+                    TheaterDTO theaterDTO = new TheaterDTO();
+                    theaterDTO = mapper.map(theater, TheaterDTO.class);
+                    result.add(theaterDTO);
                 }
         );
         return result;

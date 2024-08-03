@@ -19,6 +19,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 @Service
 public class PromotionService implements IPromotionService {
     @Autowired
@@ -46,8 +49,8 @@ public class PromotionService implements IPromotionService {
             promotionModel = promotionRepository.save(promotionModel);
             List<PromotionModel> promotionModels = new ArrayList<>();
             promotionModels.add(promotionModel);
-            List<UserModel> userModels = userRepository.findAll();
-            userModels.stream().forEach(userModel->{
+            Iterable<UserModel> userModels = userRepository.findAll();
+            userModels.forEach(userModel->{
                 userModel.setPromotions(promotionModels);
             });
             userRepository.saveAll(userModels);

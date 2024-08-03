@@ -13,8 +13,8 @@ import com.xb.cinstar.payload.response.MessageResponse;
 import com.xb.cinstar.payload.response.TokenRefreshResponse;
 import com.xb.cinstar.repository.IRoleRepository;
 import com.xb.cinstar.repository.IUserRepository;
-import com.xb.cinstar.service.RefreshTokenService;
-import com.xb.cinstar.service.UserDetailsImpl;
+import com.xb.cinstar.service.impl.RefreshTokenService;
+import com.xb.cinstar.service.impl.UserDetailsImpl;
 import com.xb.cinstar.service.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -25,12 +25,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.management.relation.Role;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 

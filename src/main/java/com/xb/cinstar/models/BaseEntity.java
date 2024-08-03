@@ -11,12 +11,13 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Date;
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class BaseEntity {
+public class BaseEntity  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private  Long id;

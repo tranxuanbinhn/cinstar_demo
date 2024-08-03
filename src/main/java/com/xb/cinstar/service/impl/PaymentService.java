@@ -69,7 +69,6 @@ public class PaymentService {
         return result;
 
     }
-
     public List<PaymentDTO> findAll(Pageable pageable)
     {
         Page<PaymentModel> theaters = paymentRepository.findAll(pageable);

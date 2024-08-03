@@ -2,11 +2,13 @@ package com.xb.cinstar.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.math.BigDecimal;
 
 @Entity
 @Data
+
 @Table(name = "ticket")
 public class TicketModel extends BaseEntity{
     @Enumerated(EnumType.STRING)

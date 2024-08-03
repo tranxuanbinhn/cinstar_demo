@@ -2,6 +2,7 @@ package com.xb.cinstar.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @Entity
 @Data
+
 @Table(name = "promotion")
 public class PromotionModel extends  BaseEntity{
     private String name;
