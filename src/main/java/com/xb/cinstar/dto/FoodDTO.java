@@ -9,6 +9,7 @@ public class FoodDTO extends AbstractDTO{
     private String description;
     private BigDecimal price;
     private String category;
+    private String image;
 
     public FoodDTO() {
 

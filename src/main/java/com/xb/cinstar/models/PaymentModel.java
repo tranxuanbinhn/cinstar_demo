@@ -12,14 +12,10 @@ public class PaymentModel extends BaseEntity{
     @Column(name = "amount", nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "payment_date", nullable = false)
-    private LocalDateTime paymentDate;
 
     @Column(name = "payment_method", nullable = false)
     private String paymentMethod;
 
-    @Column(name = "status", nullable = false)
-    private String status;
 
     @OneToOne()
     private OrderModel order;

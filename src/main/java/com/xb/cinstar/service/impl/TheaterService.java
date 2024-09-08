@@ -97,6 +97,11 @@ public class TheaterService implements ITheaterService {
         );
         return result;
     }
+    public TheaterDTO findOneByOrderId(Long id)
+    {
+        TheaterModel theaterModel = theaterRespository.findTheaterByOrderId(id);
+        return  mapper.map(theaterModel, TheaterDTO.class);
+    }
 
     public TheaterDTO findById(Long id){
     if(!theaterRespository.existsById(id))

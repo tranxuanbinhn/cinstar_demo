@@ -63,6 +63,7 @@ public class TheaterControllerAdmin {
             return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
     }
 
+
 //    @PostMapping("/seat")
 //    public ResponseEntity<?> test()
 //    {

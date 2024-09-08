@@ -11,9 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin("${allowed.origin}")
 @RestController
-@RequestMapping("/test/user/theater")
+@RequestMapping("/api/user/theater")
 public class TheaterControllerUser {
     @Autowired
     private TheaterService theaterService;
@@ -34,7 +34,7 @@ public class TheaterControllerUser {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
     @GetMapping("/findallbycity")
-    public ResponseEntity<?> getAllBuCity(@RequestParam("city") String city)
+    public ResponseEntity<?> getAllByCity(@RequestParam("city") String city)
     {
 
         List<TheaterDTO> result = theaterService.findTheaterByCity(city);

@@ -14,10 +14,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public class PaymentService {
     @Autowired
     private IPaymentRepository paymentRepository;
+    @Autowired
     private IOrderRepository orderRepository;
 
     @Autowired private ModelMapper mapper;
@@ -28,10 +31,19 @@ public class PaymentService {
             PaymentModel paymentModel = new PaymentModel();
 
             paymentModel = mapper.map(paymentDTO, PaymentModel.class);
-            OrderModel orderModel = orderRepository.findById(paymentDTO.getOrderId())
-                    .orElseThrow(()->new ResourceNotFoundException("Not found this order"));
-            paymentModel.setOrder(orderModel);
+            Optional<OrderModel> orderModel = orderRepository.findById(paymentDTO.getOrderId());
+            if(!orderModel.isPresent())
+            {
+                throw new ResourceNotFoundException("not found this order");
+            }
+            orderModel.get().setStatus(true);
+
+            OrderModel orderModel1 = new OrderModel();
+            orderModel1 =  orderRepository.save((orderModel).get());
+            paymentModel.setOrder(orderModel1);
             paymentModel = paymentRepository.save(paymentModel);
+
+
             PaymentDTO result = mapper.map(paymentModel, PaymentDTO.class);
             result.setOrderId(paymentModel.getOrder().getId());
             return result;

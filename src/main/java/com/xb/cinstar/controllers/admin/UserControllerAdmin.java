@@ -8,12 +8,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/test/user")
+@RequestMapping("/api/admin/user")
 public class UserControllerAdmin {
 
     @Autowired
@@ -31,7 +32,7 @@ public class UserControllerAdmin {
         UserDTO result =  userService.save(userDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
-    @GetMapping( )
+    @GetMapping()
     public ResponseEntity<?> getAll(@RequestParam("page") int page,@RequestParam("limit") int limit)
     {
         Pageable pageable = PageRequest.of(page-1, limit);
@@ -39,6 +40,10 @@ public class UserControllerAdmin {
         PageResponse result = new PageResponse();
         result.setResults(userDTOS);
         result.setPage(page);
+        int count =(int) userService.count();
+
+//        result.setCounts(Math.ceil(count/limit));
+        result.setCounts(count);
         result.setLimit(limit);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -46,7 +51,7 @@ public class UserControllerAdmin {
     public ResponseEntity<?> getDetail(@PathVariable("id") Long id)
     {
 
-        UserDTO userDTO = userService.findById(id);
+        UserDTO userDTO = userService.findUser(id);
 
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }

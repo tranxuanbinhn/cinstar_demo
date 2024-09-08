@@ -19,7 +19,7 @@ public class TheaterModel extends BaseEntity{
     @ManyToMany(mappedBy = "theaters",fetch = FetchType.LAZY)
     private List<MovieModel> movies;
 
-    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ShowTimeModel> showtimes;
 
     @OneToMany(mappedBy = "theater")

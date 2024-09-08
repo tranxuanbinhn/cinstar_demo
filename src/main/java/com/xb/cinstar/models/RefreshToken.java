@@ -11,8 +11,8 @@ import java.time.Instant;
 @Entity
 @Table(name = "refreshtoken")
 public class RefreshToken extends  BaseEntity{
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @ManyToOne
+    @JoinColumn(name = "userid")
     private UserModel userModel;
 
     private Instant expiryDate;

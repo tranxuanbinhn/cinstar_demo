@@ -12,10 +12,12 @@ public class TicketOrderModel extends BaseEntity{
 
 
     @OneToMany(mappedBy = "ticketorder")
-    private List<TicketModel> tickets;
+    private List<TicketRelation> tickets;
 
     @OneToMany(mappedBy = "ticketorder")
-    private List<FoodModel> foods;
+    private List<FoodRelation> foods;
+
+
 
     @OneToOne(mappedBy = "ticketorder")
     private OrderModel order;

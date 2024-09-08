@@ -39,10 +39,13 @@ public class ScreenService implements IScreenService{
     public ScreenDTO save(ScreenDTO screenDTO)
     {
         try{
-            ScreenModel screenModel = new ScreenModel();
+            ScreenModel screenModel ;
             if(screenDTO.getId()!=null)
             {
                 screenModel = screenRespository.findById(screenDTO.getId()).orElseThrow(()->new ResourceNotFoundException("Not found screen update"));
+            }
+            else {
+                screenModel = new ScreenModel();
             }
             screenModel = mapper.map(screenDTO, ScreenModel.class);
             List<SeatModel> seatModels = new ArrayList<>();
@@ -61,7 +64,7 @@ public class ScreenService implements IScreenService{
             TheaterModel theaterModel =theaterRespository.findById(screenDTO.getTheaterId()).orElseThrow(()-> new ResourceNotFoundException("Not found theater"));
             screenModel.setTheater(theaterModel);
             screenModel = screenRespository.save(screenModel);
-            seatRespository.saveAll(seatModels);
+
             return mapper.map(screenModel, ScreenDTO.class);
 
 
@@ -72,7 +75,35 @@ public class ScreenService implements IScreenService{
         }
     }
 
+    public ScreenDTO update(ScreenDTO screenDTO) {
+        try {
+            // Tìm kiếm ScreenModel theo ID
+            ScreenModel screenModel = screenRespository.findById(screenDTO.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Not found screen to update"));
 
+
+
+            // Tạo danh sách seatModels
+            List<SeatModel> seatModels = new ArrayList<>();
+            for (Long id : screenDTO.getSeatIds()) {
+                SeatModel seatModel = seatRespository.findById(id)
+                        .orElseThrow(() -> new ResourceNotFoundException("Not found seat"));
+                seatModels.add(seatModel);
+            }
+            screenModel.setSeats(seatModels);
+
+
+
+            // Lưu thực thể đã cập nhật vào repository
+            screenModel = screenRespository.save(screenModel);
+
+            // Chuyển đổi lại thành DTO và trả về
+            return mapper.map(screenModel, ScreenDTO.class);
+
+        } catch (ResourceNotFoundException e) {
+            throw new ResourceNotFoundException("Resource not found: " + e.getMessage());
+        }
+    }
     @Override
     public boolean delete(Long id) {
         try{
@@ -103,6 +134,18 @@ public class ScreenService implements IScreenService{
         Page<ScreenModel> theaters = screenRespository.findAll(pageable);
         List<ScreenDTO> result = new ArrayList<>();
         theaters.getContent().stream().forEach(theater->{
+                    ScreenDTO screenDTO = new ScreenDTO();
+                    screenDTO = mapper.map(theater, ScreenDTO.class);
+                    result.add(screenDTO);
+                }
+        );
+        return result;
+    }
+    public List<ScreenDTO> findAllByTheaterId(Long id)
+    {
+        List<ScreenModel> theaters = screenRespository.findAllByTheaterId(id);
+        List<ScreenDTO> result = new ArrayList<>();
+        theaters.stream().forEach(theater->{
                     ScreenDTO screenDTO = new ScreenDTO();
                     screenDTO = mapper.map(theater, ScreenDTO.class);
                     result.add(screenDTO);

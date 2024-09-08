@@ -1,5 +1,6 @@
 package com.xb.cinstar.service.impl;
 
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import com.xb.cinstar.dto.CustomerDTO;
 import com.xb.cinstar.exception.InvalidRequestException;
 import com.xb.cinstar.exception.ResourceNotFoundException;
@@ -18,8 +19,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CustomerService {
@@ -40,6 +43,23 @@ public class CustomerService {
             throw new InvalidRequestException("Invalid Customer");
         }
     }
+    public CustomerDTO findOne(Long customerId)
+    {
+        try{
+
+            Optional<CustomerModel> customerEntity = customerRespository.findById(customerId);
+            if(!customerEntity.isPresent())
+            {
+                throw new ResourceNotFoundException("Not found thí customer");
+            }
+            return  mapper.map(customerEntity.get(), CustomerDTO.class);
+        }
+        catch (ResourceNotFoundException e)
+        {
+            throw new InvalidRequestException("Invalid Customer");
+        }
+    }
+
 
 
 

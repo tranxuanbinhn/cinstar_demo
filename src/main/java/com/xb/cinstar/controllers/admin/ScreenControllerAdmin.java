@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/test/screen")
+@RequestMapping("/api/admin/screen")
 public class ScreenControllerAdmin {
     @Autowired
     private ScreenService screenService;
@@ -21,7 +21,7 @@ public class ScreenControllerAdmin {
     public ResponseEntity<?> save(@RequestBody ScreenDTO screenDTO)
     {
         List<Long> list = new ArrayList<>();
-        for (Long i = 8226L; i < 8436; i++){
+        for (Long i = 8437L; i < 8536L; i++){
             list.add(i);
         }
         screenDTO.setSeatIds(list);
@@ -29,15 +29,16 @@ public class ScreenControllerAdmin {
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id,@RequestBody ScreenDTO screenDTO)
+    public ResponseEntity<?> update(@PathVariable Long id)
     {
+        ScreenDTO screenDTO = new ScreenDTO();
         List<Long> list = new ArrayList<>();
-//        for (Long i = 8226L; i < 8436; i++){
-//            list.add(i);
-//        }
-//        screenDTO.setSeatIds(list);
+        for (Long i = 8437L; i < 8536L; i++){
+            list.add(i);
+        }
+        screenDTO.setSeatIds(list);
         screenDTO.setId(id);
-        ScreenDTO result =  screenService.save(screenDTO);
+        ScreenDTO result =  screenService.update(screenDTO);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -50,5 +51,12 @@ public class ScreenControllerAdmin {
             return new ResponseEntity<>(HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_GATEWAY);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findAllByTheaterId(@PathVariable("id") Long id)
+    {
+
+        List<ScreenDTO> result = screenService.findAllByTheaterId(id);
+        return ResponseEntity.ok(result);
     }
 }

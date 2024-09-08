@@ -2,13 +2,8 @@ package com.xb.cinstar.service.impl;
 
 import com.xb.cinstar.dto.TicketOrderDTO;
 import com.xb.cinstar.exception.ResourceNotFoundException;
-import com.xb.cinstar.models.BaseEntity;
-import com.xb.cinstar.models.FoodModel;
-import com.xb.cinstar.models.TicketModel;
-import com.xb.cinstar.models.TicketOrderModel;
-import com.xb.cinstar.repository.IFoodRespository;
-import com.xb.cinstar.repository.ITicketOrderRespository;
-import com.xb.cinstar.repository.ITicketRespository;
+import com.xb.cinstar.models.*;
+import com.xb.cinstar.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,8 +15,8 @@ import java.util.stream.Collectors;
 @Service
 public class TicketOrderService {
     @Autowired private ITicketOrderRespository ticketOrderRespository;
-    @Autowired private ITicketRespository ticketRespository;
-    @Autowired private IFoodRespository foodRespository;
+    @Autowired private ITicketRelationRepository iTicketRelationRepository;
+    @Autowired private IFoodRelationRepository foodRespository;
 
     @Autowired private ModelMapper mapper;
 
@@ -29,30 +24,30 @@ public class TicketOrderService {
     {
         TicketOrderModel ticketOrderModel = new TicketOrderModel();
         ticketOrderModel = ticketOrderRespository.save(ticketOrderModel);
-        List<TicketModel> ticketModels = new ArrayList<>();
-        List<FoodModel> foodModels = new ArrayList<>();
+        List<TicketRelation> ticketRelations = new ArrayList<>();
+        List<FoodRelation> foodModels = new ArrayList<>();
 
-        for (Long id: ticketOrderDTO.getTicketIds()){
-            TicketModel ticketModel = ticketRespository.findById(id)
+        for (Long id: ticketOrderDTO.getTicketRelationIds()){
+            TicketRelation ticketRelation = iTicketRelationRepository.findById(id)
                     .orElseThrow(()-> new ResourceNotFoundException("Not found this ticket model"));
-            ticketModel.setTicketorder(ticketOrderModel);
-            ticketModels.add(ticketModel);
+            ticketRelation.setTicketorder(ticketOrderModel);
+            ticketRelations.add(ticketRelation);
         };
 
         if(ticketOrderDTO.getFoodIds()!=null)
         {
             for (Long id: ticketOrderDTO.getFoodIds()){
-                FoodModel foodModel = foodRespository.findById(id)
+                FoodRelation foodModel = foodRespository.findById(id)
                         .orElseThrow(()-> new ResourceNotFoundException("Not found this ticket model"));
                 foodModel.setTicketorder(ticketOrderModel);
                 foodModels.add(foodModel);
             };
         }
-        ticketRespository.saveAll(ticketModels);
+        iTicketRelationRepository.saveAll(ticketRelations);
         foodRespository.saveAll(foodModels);
         TicketOrderDTO result = new TicketOrderDTO();
         result = mapper.map(ticketOrderModel, TicketOrderDTO.class);
-        result.setTicketIds(ticketModels.stream().map(BaseEntity::getId).collect(Collectors.toList()));
+        result.setTicketRelationIds(ticketRelations.stream().map(BaseEntity::getId).collect(Collectors.toList()));
         result.setFoodIds(foodModels.stream().map(BaseEntity::getId).collect(Collectors.toList()));
 
         return  result;
@@ -62,7 +57,7 @@ public class TicketOrderService {
         TicketOrderModel ticketOrderModel = ticketOrderRespository.findByOrderId(orderId);
         TicketOrderDTO result = new TicketOrderDTO();
         result = mapper.map(ticketOrderModel, TicketOrderDTO.class);
-        result.setTicketIds(ticketOrderModel.getTickets().stream().map(BaseEntity::getId).collect(Collectors.toList()));
+        result.setTicketRelationIds(ticketOrderModel.getTickets().stream().map(BaseEntity::getId).collect(Collectors.toList()));
         result.setFoodIds(ticketOrderModel.getFoods().stream().map(BaseEntity::getId).collect(Collectors.toList()));
        return  result;
     }

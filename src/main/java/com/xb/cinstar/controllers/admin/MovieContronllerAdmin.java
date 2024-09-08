@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/test/movie")
+@RequestMapping("/api/admin/movie")
 public class MovieContronllerAdmin {
     @Autowired
     private MovieService movieService;
@@ -41,11 +41,29 @@ public class MovieContronllerAdmin {
         MoviePOJO moviePOJO = movieService.getDetailMovie(id);
         return new ResponseEntity<>(moviePOJO, HttpStatus.OK);
     }
+
+    @GetMapping("/database/upcomming")
+    public ResponseEntity<?> getUpcomingMovieDataBase()
+    {
+
+        List<MovieDTO> result = movieService.getCommingSoonMovie();
+
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @GetMapping("/database/showing")
+    public ResponseEntity<?> getShowingMovieDataBase()
+    {
+
+        List<MovieDTO> result = movieService.getShowingMovie();
+
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
     @PostMapping("/add")
     public ResponseEntity<?> save(@RequestBody RequestPOJO requestPOJO)
     {
-        List<Long> arr = new ArrayList<>();
-        arr.add(4L);
+
         MovieDTO movieDTO = movieService.saveMovie(requestPOJO.getMoviePOJO(), requestPOJO.getTypeMovie(),requestPOJO.getTheaterIds());
         return new ResponseEntity<>(movieDTO, HttpStatus.OK);
     }

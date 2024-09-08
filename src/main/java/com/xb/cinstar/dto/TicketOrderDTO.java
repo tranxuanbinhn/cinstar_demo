@@ -14,9 +14,9 @@ import java.util.List;
 @Data
 public class TicketOrderDTO {
 
-     private List<Long> ticketIds;
+     private List<Long> ticketRelationIds;
     private List<Long> foodIds;
-
+    private Long id;
 
     public TicketOrderDTO() {
 

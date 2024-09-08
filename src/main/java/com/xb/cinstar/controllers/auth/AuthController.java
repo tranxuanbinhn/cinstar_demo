@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
+@CrossOrigin("${allowed.origin}")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -53,11 +54,6 @@ public class AuthController {
     @Autowired
     private RefreshTokenService refreshTokenService;
 
-    @GetMapping("/hello")
-    public  String hello()
-    {
-        return  "hello";
-    }
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
@@ -112,7 +108,7 @@ public class AuthController {
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
-
+    @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshRequest request)
     {
         return refreshTokenService.findByRefreshToken(request.getRefreshToken())
@@ -128,10 +124,9 @@ public class AuthController {
     }
 
     @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser() {
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = userDetails.getId();
-        refreshTokenService.deleteByUserId(userId);
+    public ResponseEntity<?> logoutUser(@CurrentSecurityContext(expression = "authentication?.name")String username) {
+
+        refreshTokenService.deleteByUsername(username);
         return ResponseEntity.ok(new MessageResponse("Log out successful!"));
     }
 }

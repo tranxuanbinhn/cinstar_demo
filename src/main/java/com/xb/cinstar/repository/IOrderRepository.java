@@ -13,6 +13,13 @@ import java.util.List;
 
 @Repository
 public interface IOrderRepository extends JpaRepository<OrderModel,Long> {
-    @Query(value = "select * from  orders where user_id = ?1", nativeQuery = true)
+    @Query(value = "select * from  orders where user_id = ?1 and status = true", nativeQuery = true)
     Page<OrderModel> findAllByUserId(Long id, Pageable pageable);
+    @Query(value = "select * from  orders where user_id = ?1 and status = true", nativeQuery = true)
+    List<OrderModel> findAllByUserId(Long id);
+
+    @Query(value = "select * from orders where status = true", nativeQuery = true)
+    Page<OrderModel> findAll(Pageable pageable);
+    @Query(value = "select count(*) from orders where status = true", nativeQuery = true)
+    long count();
 }

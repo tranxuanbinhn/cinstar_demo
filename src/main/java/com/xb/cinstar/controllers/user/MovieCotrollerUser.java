@@ -12,9 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin("${allowed.origin}")
 @RestController
-@RequestMapping("/test/user/movie")
+@RequestMapping("/api/user/movie")
 public class MovieCotrollerUser {
     @Autowired private MovieService movieService;
     @GetMapping("/upcomming")
@@ -31,6 +31,24 @@ public class MovieCotrollerUser {
     {
 
         List<MovieDTO> result = movieService.getShowingMovie();
+
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @GetMapping("/showing/{id}")
+    public ResponseEntity<?> getShowingMovieByTheater(@PathVariable Long id)
+    {
+
+        List<MovieDTO> result = movieService.getShowingMovieByTheaterId(id);
+
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    }
+    @GetMapping("/upcomming/{id}")
+    public ResponseEntity<?> getUpcommingMovieByTheater(@PathVariable Long id)
+    {
+
+        List<MovieDTO> result = movieService.getUpcommingMovieByTheaterId(id);
 
 
         return new ResponseEntity<>(result, HttpStatus.OK);
@@ -56,6 +74,17 @@ public class MovieCotrollerUser {
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     };
+
+    @GetMapping("/newmovie")
+    public ResponseEntity<?> getNewMovie()
+    {
+
+        List<MovieDTO> result = movieService.showFiveFilmNew();
+
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
+    };
+
 
 
 

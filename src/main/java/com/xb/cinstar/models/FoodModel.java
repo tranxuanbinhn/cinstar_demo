@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Data
@@ -15,10 +16,9 @@ public class FoodModel extends BaseEntity {
     private String description;
     private BigDecimal price;
     private String category;
-    private  Integer quantity;
+    private String image;
 
-    @ManyToOne()
-    @JoinColumn(name = "ticket_order")
-    private TicketOrderModel ticketorder;
+    @OneToMany(mappedBy = "food")
+    private List<FoodRelation> ticketorder;
 
 }

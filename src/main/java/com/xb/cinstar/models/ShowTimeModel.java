@@ -4,7 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.redis.core.RedisHash;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 @Data
@@ -12,9 +14,18 @@ import java.util.List;
 
 @Table(name = "showtime")
 public class ShowTimeModel extends BaseEntity{
-    private LocalDateTime date;
-
+    private LocalDate date;
+    private LocalTime time;
+    private LocalDateTime dateTime;
     private LocalDateTime endTime;
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime() {
+        this.dateTime = date.atTime(time);
+    }
 
     @ManyToOne()
     @JoinColumn(name = "movie_id")
@@ -28,8 +39,9 @@ public class ShowTimeModel extends BaseEntity{
     @JoinColumn(name = "theater_id")
     private TheaterModel theater;
 
-    @OneToMany(mappedBy = "showtime")
-    private List<TicketModel> tickets;
+    @OneToMany(mappedBy = "showtime", cascade = CascadeType.ALL)
+    private List<TicketRelation> tickets;
+
 
 
 

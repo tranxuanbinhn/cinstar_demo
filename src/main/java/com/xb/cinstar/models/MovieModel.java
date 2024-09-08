@@ -23,6 +23,7 @@ public class MovieModel extends  BaseEntity{
     private  String overview;
 
     private  String runtime;
+    private  String backdroPath;
 
     private  ETypeMovie typeMovie;
 

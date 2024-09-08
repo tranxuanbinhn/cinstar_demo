@@ -10,17 +10,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+@CrossOrigin("${allowed.origin}")
 @RestController
-@RequestMapping("/test/user/ticket")
+@RequestMapping("/api/user/ticket")
 public class TickerControllerUser {
     @Autowired
     private TicketService ticketService;
-    @PostMapping("/add")
-    public ResponseEntity<?> save(@RequestBody TicketDTO ticketDTO)
+
+
+    @GetMapping("/getall")
+    public ResponseEntity<?> findAll()
     {
 
-        TicketDTO result = ticketService.save(ticketDTO);
+        List<TicketDTO> result = ticketService.findAll();
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }

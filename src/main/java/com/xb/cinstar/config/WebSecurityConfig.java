@@ -5,9 +5,11 @@ import com.xb.cinstar.service.jwt.AuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -64,9 +66,11 @@ public class WebSecurityConfig {
 
         http.csrf(crsf -> crsf.disable());
         http .authorizeHttpRequests((authz) -> authz
+                .requestMatchers("/ws/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                .requestMatchers("/api/user/**").hasRole("USER")
-                .requestMatchers("/api/auth/**","/hello","/test/**","/api/vnpay/**").permitAll()
+
+                .requestMatchers("/api/information/**").hasRole(("USER"))
+                .requestMatchers("/api/auth/**","/hello","/test/**","/api/vnpay/**","/api/user/**","/api/message/**").permitAll()
                 .anyRequest().authenticated()
         );
         http.exceptionHandling(expt -> expt.authenticationEntryPoint(unauthorizedHandler));

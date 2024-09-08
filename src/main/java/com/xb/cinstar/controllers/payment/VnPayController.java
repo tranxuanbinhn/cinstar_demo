@@ -2,6 +2,7 @@ package com.xb.cinstar.controllers.payment;
 
 import com.xb.cinstar.config.vnpayConfig;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,10 +14,16 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
-@CrossOrigin(origins = "*", maxAge = 3600)
+
 @RestController
 @RequestMapping(value = "/api/vnpay")
 public class VnPayController {
+    @Value("${vnp_TmnCode}")
+    private String tmnCode;
+    @Value("${vnp_Returnurl}")
+    private String returnUrl;
+    @Value("${vnp_HashSecret}")
+    private String hashSecret;
     @PostMapping("/make")
     public Map<String, String> createPayment(HttpServletRequest request, @RequestParam(name = "vnp_OrderInfor") String vnp_OrderInfo,
                                              @RequestParam(name = "vnp_OrderType") String ordertype, @RequestParam(name = "vnp_Amount") Integer amount,
@@ -25,7 +32,7 @@ public class VnPayController {
         String vnp_Command = "pay";
         String vnp_TxnRef = vnpayConfig.getRandomNumber(8);
         String vnp_IpAddr = vnpayConfig.getIpAddress(request);
-        String vnp_TmnCode = vnpayConfig.vnp_TmnCode;
+        String vnp_TmnCode = tmnCode;
 
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnp_Version);
@@ -45,7 +52,7 @@ public class VnPayController {
         } else {
             vnp_Params.put("vnp_Locale", "vn");
         }
-        vnp_Params.put("vnp_ReturnUrl", vnpayConfig.vnp_Returnurl);
+        vnp_Params.put("vnp_ReturnUrl", returnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
@@ -91,7 +98,7 @@ public class VnPayController {
         }
 
         String queryUrl = query.toString();
-        String vnp_SecureHash = vnpayConfig.hmacSHA512(vnpayConfig.vnp_HashSecret , hashData.toString());
+        String vnp_SecureHash = vnpayConfig.hmacSHA512(hashSecret, hashData.toString());
         // System.out.println("HashData=" + hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = vnpayConfig.vnp_PayUrl + "?" + queryUrl;

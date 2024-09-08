@@ -16,6 +16,8 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
@@ -29,6 +31,7 @@ public class UserService implements IUserService {
     @Autowired private IUserRepository userRepository;
     @Autowired private IRoleRepository roleRepository;
     @Autowired private ModelMapper mapper;
+    @Autowired private PasswordEncoder passwordEncoder;
     @Override
     public UserDTO save(UserDTO userDTO) {
     UserModel userModel = new UserModel();
@@ -128,7 +131,52 @@ public class UserService implements IUserService {
 
     }
 
+    public UserDTO update(UserDTO userDTO)
+    {
+        Optional<UserModel> userModel = userRepository.findByUserName(userDTO.getUserName());
+        if(!userModel.isPresent())
+        {
+            throw new ResourceNotFoundException("not found user");
 
+        }
+        userModel.get().setBirthDay(userDTO.getBirthDay());
+        if(!userModel.get().getEmail().equals(userDTO.getEmail()))
+        {
+            if (userRepository.existsByEmail(userDTO.getEmail())) {
+                throw  new InvalidRequestException("email exist");
+            }
+        }
+        userModel.get().setEmail(userDTO.getEmail());
+        userModel.get().setFullName(userDTO.getFullName());
+        if(!userModel.get().getPhoneNumber().equals(userDTO.getPhoneNumber()))
+        {
+            if (userRepository.existsByPhoneNumber(userDTO.getPhoneNumber())) {
+                throw  new InvalidRequestException("phone number exist");
+            }
+        }
+        userModel.get().setPhoneNumber(userDTO.getPhoneNumber());
+        UserModel userModel1 = userRepository.save(userModel.get());
+        return mapper.map(userModel1, UserDTO.class);
+
+    }
+    public UserDTO changePassword(UserDTO userDTO)
+    {
+        Optional<UserModel> userModel = userRepository.findByUserName(userDTO.getUserName());
+        if(!userModel.isPresent())
+        {
+            throw new ResourceNotFoundException("not found user");
+
+        }
+        if(!passwordEncoder.matches(userDTO.getOldPassword(), userModel.get().getPassword()))
+        {
+            throw  new InvalidRequestException("Invalid password");
+        }
+        userModel.get().setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        UserModel userModel1 = userRepository.save(userModel.get());
+
+        return mapper.map(userModel1, UserDTO.class);
+
+    }
     @Override
     public boolean update(Long id) {
         return false;
@@ -139,12 +187,28 @@ public class UserService implements IUserService {
         return null;
     }
 
-    public UserDTO findById(Long id) {
+    public UserDTO findById(String userName) {
+
+        Optional<UserModel> userModel = userRepository.findByUserName(userName);
+        if(!userModel.isPresent())
+        {
+            throw new ResourceNotFoundException( "Not found user");
+        }
+
+        UserDTO userDTO = new UserDTO();
+        userDTO = mapper.map(userModel.get(), UserDTO.class);
+        List<ERole> role = userModel.get().getRoles().stream().map(RoleModel::getName).collect(Collectors.toList());
+        userDTO.setRole(role.get(0));
+        return userDTO;
+    }
+    public UserDTO findUser(Long id) {
+
         Optional<UserModel> userModel = userRepository.findById(id);
         if(!userModel.isPresent())
         {
             throw new ResourceNotFoundException( "Not found user");
         }
+
         UserDTO userDTO = new UserDTO();
         userDTO = mapper.map(userModel.get(), UserDTO.class);
         List<ERole> role = userModel.get().getRoles().stream().map(RoleModel::getName).collect(Collectors.toList());
@@ -152,6 +216,9 @@ public class UserService implements IUserService {
         return userDTO;
     }
 
+    public long count() {
+        return  userRepository.count();
+    }
     @Override
     public List<UserDTO> findAll(Pageable pageable) {
         Page<UserModel> list = userRepository.findAll(pageable);

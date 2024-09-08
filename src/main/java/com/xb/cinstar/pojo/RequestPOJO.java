@@ -7,7 +7,7 @@ import java.util.List;
 
 @Data
 public class RequestPOJO {
-            private List<Long> theaterIds;
+    private List<Long> theaterIds;
     ETypeMovie typeMovie;
     MoviePOJO moviePOJO;
 

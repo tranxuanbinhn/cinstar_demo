@@ -7,6 +7,7 @@ import java.util.List;
 public class PageResponse<T> {
     private int page;
     private int limit;
+    private double counts;
     private List<T> results;
 
     public PageResponse() {

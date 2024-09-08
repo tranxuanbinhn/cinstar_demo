@@ -33,20 +33,16 @@ public class TicketService {
     {
         try{
             TicketModel ticketModel = new TicketModel();
+            if(ticketDTO.getId()!=null)
+            {
+                ticketModel = ticketRespository.findById(ticketDTO.getId()).get();
+            }
 
             ticketModel = mapper.map(ticketDTO, TicketModel.class);
-            ShowTimeModel showTimeModel = showtimeRespository.findById(ticketDTO.getShowtimeId())
-                    .orElseThrow(()->new ResourceNotFoundException("Not found Showtime"));
-            SeatModel seatModel = seatRespository.findById(ticketDTO.getSeatId())
-                    .orElseThrow(()->new ResourceNotFoundException("Not found this seat"));
-            ticketModel.setShowtime(showTimeModel);
-            ticketModel.setSeat(seatModel);
 
             ticketModel = ticketRespository.save(ticketModel);
             TicketDTO result = mapper.map(ticketModel, TicketDTO.class);
-            result.setSeatId(ticketModel.getId());
-            result.setShowtimeId(ticketModel.getShowtime().getId());
-            seatModel.setStatus(true);
+           ;
             return result;
         }
         catch (ResourceNotFoundException e)
@@ -73,11 +69,11 @@ public class TicketService {
 
 
 
-    public List<TicketDTO> findAll(Pageable pageable)
+    public List<TicketDTO> findAll()
     {
-        Page<TicketModel> theaters = ticketRespository.findAll(pageable);
+        List<TicketModel> theaters = ticketRespository.findAll();
         List<TicketDTO> result = new ArrayList<>();
-        theaters.getContent().stream().forEach(theater->{
+        theaters.stream().forEach(theater->{
             TicketDTO ticketDTO = new TicketDTO();
             ticketDTO = mapper.map(theater, TicketDTO.class);
             result.add(ticketDTO);

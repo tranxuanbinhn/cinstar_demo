@@ -11,20 +11,30 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Data
 public class ShowTimeDTO extends AbstractDTO{
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime date;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate date;
+    @JsonFormat(pattern = "HH:mm:ss")
+    private LocalTime time;
     private Long movieId;
     private Long screenId;
     private Long theaterId;
     private List<Long> ticketIds;
     private LocalDateTime endTime;
     private String dateRedis;
+    private String datetimeRedis;
+    private String timeRedis;
+    private String movieTitle;
+    private String screenName;
+    private String theaterName;
+
 
 
 }

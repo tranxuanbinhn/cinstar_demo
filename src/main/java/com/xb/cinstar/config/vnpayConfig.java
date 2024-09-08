@@ -2,6 +2,8 @@ package com.xb.cinstar.config;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -9,14 +11,19 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 public class vnpayConfig {
     public static String vnp_PayUrl = "http://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_Returnurl = "http://localhost:3000/resultorder";
-    public static String vnp_TmnCode = "2YBERWBW";
-    public static String vnp_HashSecret = "FKITIOCDQUUFESRNAVATNSLZHCLXDVTO";
+    @Value("${vnp_Returnurl}")
+    private String vnp_Returnurl ;
+    @Value("${vnp_TmnCode}")
+    private  String vnp_TmnCode ;
+    @Value("${vnp_HashSecret}")
+    private  String vnp_HashSecret;
+
     public static String vnp_apiUrl = "http://sandbox.vnpayment.vn/merchant_webapi/merchant.html";
 
 
     //Util for VNPAY
-    public static String hashAllFields(Map fields) {
+    public static String hashAllFields(Map fields, String vnp_HashSecret) {
+
         List fieldNames = new ArrayList(fields.keySet());
         Collections.sort(fieldNames);
         StringBuilder sb = new StringBuilder();

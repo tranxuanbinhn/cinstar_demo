@@ -53,5 +53,9 @@ public class RefreshTokenService {
     public int deleteByUserId(Long userId) {
         return refreshTokenRepository.deleteByUserModel(userRepository.findById(userId).get());
     }
+    @Transactional
+    public int deleteByUsername(String username) {
+        return refreshTokenRepository.deleteAllByUserId(userRepository.findByUserName(username).get().getId());
+    }
 
 }

@@ -1,10 +1,7 @@
 package com.xb.cinstar.service.impl;
 
 import com.xb.cinstar.constant.Constant;
-import com.xb.cinstar.dto.MovieDTO;
-import com.xb.cinstar.dto.MovieTheaterDTO;
-import com.xb.cinstar.dto.TheaterDTO;
-import com.xb.cinstar.dto.UserDTO;
+import com.xb.cinstar.dto.*;
 import com.xb.cinstar.exception.ResourceNotFoundException;
 import com.xb.cinstar.models.ETypeMovie;
 import com.xb.cinstar.models.MovieModel;
@@ -34,6 +31,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -98,7 +97,7 @@ public class MovieService  extends BaseRedisServiceImpl implements IGenricServic
         HttpEntity<String> request = new HttpEntity<>(headers);
 
         ResponseEntity<MoviePOJO> response = restTemplate
-                .exchange(urlMain+"/"+id+"?language=en-US", HttpMethod.GET, request, MoviePOJO.class);
+                .exchange(urlMain+"/"+id+"?language=vi", HttpMethod.GET, request, MoviePOJO.class);
         MoviePOJO movie = response.getBody();
 
 
@@ -186,7 +185,7 @@ public class MovieService  extends BaseRedisServiceImpl implements IGenricServic
     public List<MovieDTO> getShowingMovie() {
 
         List<MovieDTO> result = new ArrayList<>();
-        if(this.exists(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX))
+        if(this.exists(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX) && movieRespository.countMovieShowing().equals(this.count(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX, MovieDTO.class) ))
         {
 
             return this.hashGetAll(Constant.ConstantRedis.MOVIE_NOWSHOWING_PREFIX, MovieDTO.class);
@@ -196,6 +195,8 @@ public class MovieService  extends BaseRedisServiceImpl implements IGenricServic
             List<MovieModel> movieModels = movieRespository.findAll();
             movieModels.forEach(movieModel -> {
                 MovieDTO movieDTO =  mapper.map(movieModel, MovieDTO.class);
+                List<Long> theaterids = movieModel.getTheaters().stream().map(TheaterModel->(TheaterModel.getId())).collect(Collectors.toList());
+                movieDTO.setTheaterIds(theaterids);
                 if(movieModel.getTypeMovie().name().equals("MOVIE_NOWSHOWING"))
                 {
                     result.add(movieDTO);
@@ -212,10 +213,67 @@ public class MovieService  extends BaseRedisServiceImpl implements IGenricServic
 
     }
 
+    public List<MovieDTO> getShowingMovieByTheaterId(Long id) {
+
+        List<MovieDTO> result = new ArrayList<>();
+        if(this.exists(Constant.ConstantRedis.MOVIE_NOWSHOWING_THEATER_PREFIX+id))
+        {
+
+            return this.hashGetAll(Constant.ConstantRedis.MOVIE_NOWSHOWING_THEATER_PREFIX+id, MovieDTO.class);
+        }
+        else
+        {
+            List<MovieModel> movieModels = movieRespository.findAllByTheatersId(id);
+            movieModels.forEach(movieModel -> {
+                MovieDTO movieDTO =  mapper.map(movieModel, MovieDTO.class);
+                if(movieModel.getTypeMovie().name().equals("MOVIE_NOWSHOWING"))
+                {
+                    result.add(movieDTO);
+                }
+
+            });
+            result.stream().forEach(movieDTO -> {
+                this.hashSet(Constant.ConstantRedis.MOVIE_NOWSHOWING_THEATER_PREFIX+id,
+                        Constant.ConstantRedis.MOVIE_PREFIX+movieDTO.getId(),movieDTO);
+            });
+            this.setTimeToLive(Constant.ConstantRedis.MOVIE_NOWSHOWING_THEATER_PREFIX+id,Constant.ConstantRedis.MOVIE_NOWSHOWING_THEATER_PREFIX_TTL);
+            return result;
+        }
+
+    }
+    public List<MovieDTO> getUpcommingMovieByTheaterId(Long id) {
+
+        List<MovieDTO> result = new ArrayList<>();
+        if(this.exists(Constant.ConstantRedis.MOVIES_UPCOMMING_THEATER_PREFIX+id))
+        {
+
+            return this.hashGetAll(Constant.ConstantRedis.MOVIES_UPCOMMING_THEATER_PREFIX, MovieDTO.class);
+        }
+        else
+        {
+            List<MovieModel> movieModels = movieRespository.findAllByTheatersId(id);
+            movieModels.forEach(movieModel -> {
+                MovieDTO movieDTO =  mapper.map(movieModel, MovieDTO.class);
+                if(movieModel.getTypeMovie().name().equals("MOVIE_COMINGSOON"))
+                {
+                    result.add(movieDTO);
+                }
+
+            });
+            result.stream().forEach(movieDTO -> {
+                this.hashSet(Constant.ConstantRedis.MOVIES_UPCOMMING_THEATER_PREFIX+id,
+                        Constant.ConstantRedis.MOVIE_PREFIX+movieDTO.getId(),movieDTO);
+            });
+            this.setTimeToLive(Constant.ConstantRedis.MOVIES_UPCOMMING_THEATER_PREFIX+id,Constant.ConstantRedis.MOVIES_UPCOMMING__THEATER_PREFIX_TTL);
+            return result;
+        }
+
+    }
+
     public List<MovieDTO> getCommingSoonMovie() {
 
         List<MovieDTO> result = new ArrayList<>();
-        if(this.exists(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX))
+        if(this.exists(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX)&&movieRespository.countMovieUpcoming().equals(this.count(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX, MovieDTO.class) ))
         {
 //            List<Object> objects = this.get(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX);
            return this.hashGetAll(Constant.ConstantRedis.MOVIES_UPCOMMING_PREFIX, MovieDTO.class);
@@ -225,6 +283,8 @@ public class MovieService  extends BaseRedisServiceImpl implements IGenricServic
             List<MovieModel> movieModels = movieRespository.findAll();
             movieModels.forEach(movieModel -> {
                 MovieDTO movieDTO = mapper.map(movieModel, MovieDTO.class);
+                List<Long> theaterids = movieModel.getTheaters().stream().map(TheaterModel->(TheaterModel.getId())).collect(Collectors.toList());
+                movieDTO.setTheaterIds(theaterids);
                 if(movieModel.getTypeMovie().name().equals("MOVIE_COMINGSOON"))
                 {
                     result.add(movieDTO);
@@ -278,17 +338,21 @@ public class MovieService  extends BaseRedisServiceImpl implements IGenricServic
         else {
             MovieModel movieModel = movieRespository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Not found this movie"));
             MovieDTO result = mapper.map(movieModel, MovieDTO.class);
-            List<Long> theaterids = new ArrayList<>();
-            movieModel.getTheaters().forEach(theaterModel -> {
-                theaterids.add(theaterModel.getId());
-                result.setTheaterIds(theaterids);
-            });
+            List<Long> theaterids = movieModel.getTheaters().stream().map(TheaterModel->(TheaterModel.getId())).collect(Collectors.toList());
+            result.setTheaterIds(theaterids);
 
-            MovieDTO movieDTO = mapper.map(movieModel, MovieDTO.class);
-            this.set(prefix+result.getId(),movieDTO);
+
+            this.set(prefix+result.getId(),result);
             this.setTimeToLive(prefix+result.getId(),Constant.ConstantRedis.MOVIE_PREFIX_TTL);
-            return  movieDTO;
+            return  result;
         }
+    }
+
+    public List<MovieDTO> showFiveFilmNew ()
+    {
+        List<MovieModel> movieModels = movieRespository.showFiveFilmNew();
+        return movieModels.stream().map(movieModel -> mapper.map(movieModel, MovieDTO.class))
+                .collect(Collectors.toList());
     }
 
     @Override

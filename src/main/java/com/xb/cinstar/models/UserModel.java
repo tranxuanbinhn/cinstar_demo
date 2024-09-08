@@ -20,6 +20,11 @@ public class UserModel extends BaseEntity{
     private  String email;
     private String password;
     private  String userName;
+    @OneToMany(mappedBy = "sender")
+    private List<MessageModel> sentMessages;
+
+    @OneToMany(mappedBy = "receiver")
+    private List<MessageModel> receivedMessages;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -32,7 +37,8 @@ public class UserModel extends BaseEntity{
     @JoinTable(name = "user_promotion", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "promotion_id"))
     private List<PromotionModel> promotions;
 
-
+    @OneToMany(mappedBy = "userModel")
+    private List<RefreshToken> refreshTokens;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private List<OrderModel> orders;

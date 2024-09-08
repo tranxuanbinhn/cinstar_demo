@@ -25,6 +25,7 @@ public class UserDTO extends  AbstractDTO{
     @NotBlank
     private  String userName;
     private ERole role;
+    private String oldPassword;
 
 
     public UserDTO() {

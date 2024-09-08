@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.data.redis.core.RedisHash;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Data
@@ -13,23 +14,14 @@ import java.math.BigDecimal;
 public class TicketModel extends BaseEntity{
     @Enumerated(EnumType.STRING)
     private ETypeTicket type;
-    private  Integer quantity;
+
 
     private BigDecimal price;
-    private String qr;
 
-    @ManyToOne
-    @JoinColumn(name = "showtime_id")
-    private ShowTimeModel showtime;
+    private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_id")
-    private SeatModel seat;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticket_order")
-    private TicketOrderModel ticketorder;
-
+    @OneToMany(mappedBy = "ticket", fetch = FetchType.LAZY)
+    private List<TicketRelation> ticketRelation;
     public TicketModel() {
 
     }

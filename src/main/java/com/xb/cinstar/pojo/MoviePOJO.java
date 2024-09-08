@@ -15,6 +15,8 @@ public class MoviePOJO implements Serializable {
     private  String releaseDate;
     @JsonProperty("poster_path")
     private String posterPath;
+    @JsonProperty("backdrop_path")
+    private String backdroPath;
     private  String overview;
 
     private String runtime;
