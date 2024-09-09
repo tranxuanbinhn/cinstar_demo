@@ -134,6 +134,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>cinstar-demo</finalName> <!-- Cấu hình tên file JAR -->
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
