@@ -70,7 +70,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
                 .requestMatchers("/api/information/**").hasRole(("USER"))
-                .requestMatchers("/api/auth/**","/hello","/test/**","/api/vnpay/**","/api/user/**","/api/message/**").permitAll()
+                .requestMatchers("/api/auth/**","/hello","/api/vnpay/**","/api/user/**","/api/message/**").permitAll()
                 .anyRequest().authenticated()
         );
         http.exceptionHandling(expt -> expt.authenticationEntryPoint(unauthorizedHandler));

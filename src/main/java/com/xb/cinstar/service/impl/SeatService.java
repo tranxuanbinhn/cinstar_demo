@@ -3,7 +3,9 @@ package com.xb.cinstar.service.impl;
 import com.xb.cinstar.dto.SeatDTO;
 import com.xb.cinstar.models.ETypeSeat;
 import com.xb.cinstar.models.SeatModel;
+
 import com.xb.cinstar.repository.ISeatRespository;
+import com.xb.cinstar.repository.ITicketRelationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 public class SeatService {
     @Autowired private ISeatRespository seatRespository;
     @Autowired private ModelMapper mapper;
-
+    @Autowired private ITicketRelationRepository iTicketRelationRepository ;
     public SeatDTO save(SeatDTO seatDTO)
     {
 
@@ -55,6 +57,24 @@ public class SeatService {
         return  seatModels.stream().map(SeatModel -> {
             SeatDTO seatDTO = mapper.map(SeatModel, SeatDTO.class);
             seatDTO.setStatus(SeatModel.isStatus());
+            return  seatDTO;
+        }).collect(Collectors.toList());
+
+    }
+    public List<SeatDTO> findByScreenIdAndShowTimeId(Long screenId, Long showtimeid)
+    {
+
+        List<SeatModel> seatModels = seatRespository.findByScreenId(screenId);
+        return  seatModels.stream().map(SeatModel -> {
+            SeatDTO seatDTO = mapper.map(SeatModel, SeatDTO.class);
+            if(iTicketRelationRepository.countTicketRelationByShowtimeAndSeat(showtimeid, seatDTO.getId())>0)
+            {
+                seatDTO.setStatus(true);
+            }
+            else{
+                seatDTO.setStatus(false);
+            }
+
             return  seatDTO;
         }).collect(Collectors.toList());
 

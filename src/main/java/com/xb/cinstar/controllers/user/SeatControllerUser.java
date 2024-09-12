@@ -18,11 +18,11 @@ public class SeatControllerUser {
 
     @Autowired
     private SeatService seatService;
-    @GetMapping("/findbyscreen/{id}")
-    public ResponseEntity<?> getAll(@PathVariable Long id)
+    @GetMapping("/findbyscreen/{id}/{showtimeid}")
+    public ResponseEntity<?> getAll(@PathVariable Long id, @PathVariable Long showtimeid)
     {
 
-        List<SeatDTO> result = seatService.findByScreenId(id);
+        List<SeatDTO> result = seatService.findByScreenIdAndShowTimeId(id, showtimeid);
 
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
