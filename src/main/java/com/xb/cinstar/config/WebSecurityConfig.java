@@ -71,7 +71,7 @@ public class WebSecurityConfig {
 
                 .requestMatchers("/api/information/**").hasRole(("USER"))
                 .requestMatchers("/api/auth/**","/hello","/api/vnpay/**","/api/user/**","/api/message/**").permitAll()
-                .anyRequest().authenticated()
+                .anyRequest().permitAll()
         );
         http.exceptionHandling(expt -> expt.authenticationEntryPoint(unauthorizedHandler));
         http.sessionManagement(smn -> smn.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
